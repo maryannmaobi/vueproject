@@ -83,7 +83,13 @@ const mutations = {
      getcarts: (state, vals) => (state.newcart = vals),
      get_total_of_array: (state, arrayfromdb) => (state.arrayfromdb = arrayfromdb),
      registerusers: (state, user) => (state.users = user),
-     loginuser(state, users){
+    loginuser(user){
+         if(user){
+            console.log('not logged')
+         }
+         else{
+             console.log('logged')
+         }
      }
 };
 
