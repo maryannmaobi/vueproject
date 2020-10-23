@@ -1,31 +1,19 @@
 <?php
 require 'database.php';
 $_POST = json_decode(file_get_contents('php://input'), true);
+// $msg = "";
+
+// $image = $_FILES['food_picture']['name'];
 
 $id = $_POST['food_id'];
-$foodtime = $_POST['mytime'];
-$fooddate = $_POST['mydate'];
-$foodname = $_POST['myname'];
-$foodprice = $_POST['myprice'];
-$foodquantity = $_POST['myquantity'];
-$fooddetail = $_POST['mydetail'];
-$foodavailability = $_POST['myavail'];
-// $image = $_FILES['myfile']['name'];
-// $target_dir = "uploads/" . basename($image);
- 
-// if ($_FILES["myfile"]["size"] > 500000) {
-//     echo "Sorry, your file is too large.";
-//   } 
-// else{
-      $insert = "UPDATE food_table SET food_time = '$foodtime', food_date = '$fooddate', food_name = '$foodname',
-             food_price = '$foodprice', food_quantity = '$foodquantity', food_detail = '$fooddetail', food_availability = '$foodavailability'
-             WHERE `food_id` = '$id' LIMIT 1";
-      
-      $myinsert = mysqli_query($mysqli, $insert);
-      var_dump($myinsert);
-//   }
-//   if (move_uploaded_file($_FILES['myfile']['tmp_name'], $target_dir)) {
-//     $msg = "Image updated successfully";
-//   }else{
-//     $msg = "Failed to update image";
-//   }
+$foodtime = $_POST['food_time'];
+$fooddate = $_POST['food_date'];
+$foodname = $_POST['food_name'];
+$foodprice = $_POST['food_price'];
+$foodquantity = $_POST['food_quantity'];
+$fooddetail = $_POST['food_detail'];
+
+  $sql ="UPDATE food_table SET food_time = '$foodtime', food_date = '$fooddate', food_name = '$foodname',
+            food_price = '$foodprice', food_quantity = '$foodquantity', food_detail = '$fooddetail'
+            WHERE `food_id` = $id";
+      echo mysqli_query($mysqli, $sql);
