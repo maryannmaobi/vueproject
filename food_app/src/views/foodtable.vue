@@ -136,14 +136,18 @@
            <input type="text" v-model="foods.food_detail" class="form-control" placeholder="detail" aria-describedby="basic-addon1">
         </div>
 
+         <!-- <div class="col-md-6" v-if="foods.food_picture">
+           <img id="image" :src="require(`../assets/food_php/uploads/${foods.food_picture}`)" alt=" --food image" style="width: 50px; height: 50px"/>
+         </div> 
+
          <div class="input-group mb-3 mt-2">
            <div class="input-group-prepend">
              <span class="input-group-text" style="background: none" id="basic-addon1">
               <i class="fa fa-picture-o"></i></span>
            </div>
-           <input type="file" class="form-control" placeholder="picture" aria-label="picture" aria-describedby="basic-addon1">
+           <input type="file" ref="file" v-on:change="readURL($event)" class="form-control" placeholder="picture" aria-label="picture" aria-describedby="basic-addon1">
         </div>
-        
+         -->
      <div>
          <label for="Is food available?">Is food available ?</label>
        <select name="" v-model="foods.food_availability" id="" style="border: 1px solid black" class="col-md-12">
@@ -174,8 +178,9 @@
 <script>
 import Addfood from '../views/addfood';
 // import Editfood from '../views/editfood';
-
+import $ from 'jquery';
 import { mapGetters, mapActions } from 'vuex';
+import Axios from 'axios';
 export default {
     name: 'Foodtable',
     components:{
@@ -185,7 +190,9 @@ export default {
 
     data(){
      return {
-         foods: {},
+         foods: {
+           
+         },
      }
     },
 
@@ -194,31 +201,54 @@ export default {
 
       submitupdate(ty) {
           console.log(ty);
-         this.allfoods.map( function(allfoods) {
-           if(allfoods.food_id == ty.food_id) {
-               allfoods.food_time = ty.food_time;
-               allfoods.food_date = ty.food_date;
-               allfoods.food_name = ty.food_name;
-               allfoods.food_price = ty.food_price;
-               allfoods.food_quantity = ty.food_quantity;
-               allfoods.food_detail = ty.food_detail;
-               allfoods.foods_availability = ty.food_availability;
-           } 
-         });
+             var myupdate = {
+                 'food_id': ty.food_id,
+                 'food_time': ty.food_time,
+                 'food_date': ty.food_date,
+                 'food_name': ty.food_name,
+                 'food_price': ty.food_price,
+                 'food_quantity': ty.food_quantity,
+                 'food_detail': ty.food_detail,
+               }
+          Axios.post('http://localhost/vuefolder/vueInvent/src/assets/food_php/updatefood.php', myupdate)
+          .then(res => console.log(res.data))
+          .catch(err => console.log(err));   
        },
 
          editfood(food){
              console.log(food);
-            let {food_id, food_time, food_date, food_name, food_price, 
+
+             let {food_id, food_time, food_date, food_name, food_price,
                  food_quantity, food_detail, food_availability} = food;
             
-            this.foods = {food_id,food_time, food_date, food_name, food_price, 
+            this.foods = {food_id,food_time, food_date, food_name, food_price,
             food_quantity, food_detail, food_availability};
-         }
+
+
+            // let {food_id, food_time, food_date, food_name, food_price,food_picture,
+            //      food_quantity, food_detail, food_availability} = food;
+            
+            // this.foods = {food_id,food_time, food_date, food_name, food_price,food_picture,
+            // food_quantity, food_detail, food_availability};
+            // console.log(this.foods);
+         },
+
+            readURL(event){
+        this.foods.food_picture = event.target.files[0];
+        // console.log(this.foods.file)
+        if (this.foods.food_picture) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#image').attr('src', e.target.result);
+                };
+
+                reader.readAsDataURL(event.target.files[0]);
+            }
+      },
     },
 
     computed: mapGetters(['allfoods']),
-    created(){
+    mounted(){
         this.fetchallfoods()
     }
 }
