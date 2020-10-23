@@ -45,7 +45,7 @@
           <td>N{{ item.food_price }}</td>
           <td>{{ item.food_quantity}}</td>
           <td>N{{ item.food_total }}</td>
-          <td> <v-btn @click="deletefood(item)"><i class="fa fa-trash"></i></v-btn></td>
+          <td> <v-btn @click="deletefood(item.food_id)"><i class="fa fa-trash"></i></v-btn></td>
         </tr>
       </tbody>
     </template>
@@ -74,7 +74,7 @@ export default {
     },
 
     computed: {
-        ...mapGetters(['newcarts'])
+        ...mapGetters(['newcarts', 'allcartsfromlocal'])
     },
 
     methods: {
@@ -87,16 +87,25 @@ export default {
         },
 
         deletefood(ty){
-         Axios.post('http://localhost/vuefolder/vueInvent/src/assets/food_php/delete.php', ty)
+          // console.log(ty);
+          let id = ty
+          console.log(id)
+          // this.newcarts = this.newcarts.filter(p => p.food_id != ty)
+          // console.log(this.newcarts);
+         Axios.post(`http://localhost/vuefolder/vueInvent/src/assets/food_php/delete.php?id=${id}`)
          .then(res => console.log(res.data))
          .catch(err => console.log(err));
          this.getallcart();
+         localStorage.setItem('carts', JSON.stringify(this.allcartsfromlocal))
         }
     },
 
     created(){
         this.getitemsfromlocalstorage();
         this.getallcart();
+    },
+    destroyed(){
+      this.deletefood();
     }
 }
 </script>
