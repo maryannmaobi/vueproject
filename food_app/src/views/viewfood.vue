@@ -31,7 +31,7 @@
 
             <v-card-subtitle class="pb-0">
        <v-btn style="background: none; box-shadow: none">
-                 <div v-if="alltime > `${foods.food_time.slice(0,2)%12, foods.food_time.slice(-3)}`">{{ foods.food_time.slice(0,2)%12 }} {{ foods.food_time.slice(-3)}} <span v-if="foods.food_time.slice(0,2)>=12">pm</span> <span v-else>am</span></div>
+                 <div v-if="alltime < `${foods.food_time.slice(0,2)%12, foods.food_time.slice(-3)}`">{{ foods.food_time.slice(0,2)%12 }} {{ foods.food_time.slice(-3)}} <span v-if="foods.food_time.slice(0,2)>=12">pm</span> <span v-else>am</span></div>
                  <div v-else>Available</div>
               </v-btn >
     </v-card-subtitle>
@@ -136,7 +136,7 @@ export default {
        quantity: '',
        food: {},
        mystore: {},
-       
+       obj: {},
      }
     },
     computed: {
@@ -168,16 +168,24 @@ export default {
                cart = [] 
              } else {
                cart = JSON.parse(localStorage.getItem('carts', 'cartsNum'));
-              // this.cartsarr.push(cart)
-              //  console.log(this.cart);
-              //  this.allcarts = cart.length;
              }
              return cart;
+            },
+
+            getaddallfoods(){
+             let food;
+             if (localStorage.getItem('foods') == null) {
+               food = [] 
+             } else {
+               food = JSON.parse(localStorage.getItem('foods'));
+             }
+             return food;
             },
 
         addtocart(ty){
           let subtract = ty.food_quantity - this.quantity;
           ty.food_quantity = subtract;
+          console.log(ty.food_quantity);
           let r = ty.food_price.split(",");
           let t = r.join('')
           let total = this.quantity * t;
@@ -193,6 +201,7 @@ export default {
           }
           // initial adding //
           var cart = this.getaddtocart();
+          // var food = this.getaddallfoods();
           if(cart.find(p => p.food_id == ty.food_id)){
           //   if (cart) {
               let newobj = [{
@@ -205,20 +214,26 @@ export default {
             food_total_row: n,
           }]
              cart = newobj;
-          // Axios.post('http://localhost/vuefolder/vueInvent/src/assets/food_php/updatecart.php', 
-          //     {
-          //      'id': newobj[0].food_id,
-          //     'name': newobj[0].food_name,
-          //     'picture': newobj[0].food_picture,
-          //     'quantity': newobj[0].food_quantity,
-          //     'price': newobj[0].food_price,
-          //     'total': newobj[0].food_total_row,
-          //     }
-          // ).then(res => console.log(res.data))
-          //   .catch(err=>console.log(err))
+          Axios.post('http://localhost/vuefolder/vueInvent/src/assets/food_php/updatecart.php', 
+              {
+               'id': newobj[0].food_id,
+              'name': newobj[0].food_name,
+              'picture': newobj[0].food_picture,
+              'quantity': newobj[0].food_quantity,
+              'price': newobj[0].food_price,
+              'total': newobj[0].food_total_row,
+              }
+          ).then(res => console.log(res.data))
+            .catch(err=>console.log(err))
 
-            // for updating  //
-         
+          Axios.post('http://localhost/vuefolder/vueInvent/src/assets/food_php/updatefoodtb.php', 
+              {
+                'id': ty.food_id,
+              'quantity': ty.food_quantity,
+              }
+          ).then(res => console.log(res.data))
+            .catch(err=>console.log(err))
+
           localStorage.setItem('carts', JSON.stringify(cart))
             console.log('Eureka!')
           }
@@ -226,9 +241,9 @@ export default {
           //    alert('It\'s more than the product quantity');
           // }
           else{
+            // console.log(this.allfoods);
             var tys = cart.push(this.mystore);
             this.quantity = '';
-            // console.log('good')
             Axios.post('http://localhost/vuefolder/vueInvent/src/assets/food_php/addtocart.php', 
               {
                'id': this.mystore.food_id,
@@ -241,6 +256,16 @@ export default {
           ).then(res => console.log(res.data))
             .catch(err=>console.log(err))
 
+          Axios.post('http://localhost/vuefolder/vueInvent/src/assets/food_php/updatefoodtb.php', 
+              {
+                'id': ty.food_id,
+              'quantity': ty.food_quantity,
+              }
+          ).then(res => console.log(res.data))
+            .catch(err=>console.log(err))
+
+            // for updating  //
+          // localStorage.setItem('foods', JSON.stringify(food))
            
             this.numbercart(tys);
            localStorage.setItem('carts', JSON.stringify(cart))
@@ -274,8 +299,7 @@ export default {
     created(){
         this.fetchallfoods();
         this.myFunction();
-          console.log(this.newcarts);
-          this.getaddtocart()
+        this.getaddtocart()
 
     },
 }
