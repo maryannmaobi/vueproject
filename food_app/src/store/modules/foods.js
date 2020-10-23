@@ -4,6 +4,7 @@ const state = {
     foods: [],
     cart: '',
     newcart: [],
+    mylocalcart: [],
     arrayfromdb: '',
     users: [],
     
@@ -12,6 +13,7 @@ const state = {
 const getters = {
     allfoods: state => state.foods,
     allcarts: state => state.cart,
+    allcartsfromlocal: state => state.mylocalcart,
     newcarts: state => state.newcart,
     totalarrayindb: state => state.arrayfromdb,
     allusers: state => state.users,
@@ -40,6 +42,20 @@ const actions = {
        commit('insertfood', response.data)
    },
 
+   getlocal({ commit }, val){
+    val = localStorage.getItem('carts');
+    console.log(val);
+      commit('getall', val)
+   },
+
+async updatefood({commit}, myupdate) {
+    const response = await axios.post('http://localhost/vuefolder/vueInvent/src/assets/food_php/updatefood.php', 
+    myupdate
+    );
+    console.log(response.data);
+    commit('updatetable', response.data);
+},   
+
 async getallcart({ commit }) {
     const response = await axios.get('http://localhost/vuefolder/vueInvent/src/assets/food_php/getcart.php');
     console.log(response.data);
@@ -47,7 +63,7 @@ async getallcart({ commit }) {
 },
 
    numbercart({ commit }, val){
-    val = localStorage.getItem('cartsNum');
+    val = localStorage.getItem('carts');
     console.log(val);
       commit('numbers', val)
    },
@@ -80,17 +96,24 @@ const mutations = {
     numbers(state, val){
          state.cart = val;
      } ,
+     getall:(state, values) => (state.mylocalcart = values),
      getcarts: (state, vals) => (state.newcart = vals),
      get_total_of_array: (state, arrayfromdb) => (state.arrayfromdb = arrayfromdb),
      registerusers: (state, user) => (state.users = user),
-    loginuser(user){
+     loginuser(user){
          if(user){
             console.log('not logged')
          }
          else{
              console.log('logged')
          }
+     },
+     updatetable(state, updating){
+        let e = state.foods.findIndex(p =>{ return p.food_id });
+        console.log(updating);
+        console.log(e);
      }
+
 };
 
 export default {
